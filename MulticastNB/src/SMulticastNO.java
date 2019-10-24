@@ -24,7 +24,37 @@ public class SMulticastNO{
             for(NetworkInterface netint:Collections.list(nets)){
                 displayInterfaceInformation(netint);
             }
-        } catch (Exception e) {
+            NetworkInterface ni = NetworkInterface.getByName("eth3");
+            DatagramChannel s = DatagramChannel.open(StandardProtocolFamily.NET);
+            s.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            s.setOption(StandardSocketOptions.IP_MULTICAST_IF, ni);
+            s.configureBlocking(false);
+            Selector sel = Selector.open();
+            s.register(sel, SelectionKey.OP_READ);
+            InetAddress group = InetAddress.getByName("230.0.0.1");
+            s.join(group, ni);
+            s.socket().bind(dir);
+            ByteBuffer b = ByteBuffer.allocate(4);
+            System.out.println("Servidor listo");
+            while (true) {
+                sel.Selector();
+                Iterator<SelectionKey> it = sel.selectedKeys().iterator();
+                while (it.hasNext()) {
+                    SelectionKey k = (SelectionKey)it.next();
+                    it.remove();
+                    if(k.isReadable()){
+                        DatagramChannel ch = (DatagramChannel)l.channel();
+                        b.clear();
+                        SocketAddress emisor = ch.receive(b);
+                        b.flip();
+                        InetSocketAddress d = (InetSocketAddress)emisor;
+                        System.out.println("Datagrama recibido desde " +d.getAddress() + ":"+ d.getPort());
+                        System.out.println("Dato: "+b.getInt());
+                        continue;
+                    }
+                }
+            }
+            } catch (Exception e) {
             e.printStackTrace();
             //TODO: handle exception
         }
