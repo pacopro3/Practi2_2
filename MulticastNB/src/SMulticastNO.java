@@ -25,7 +25,7 @@ public class SMulticastNO{
                 displayInterfaceInformation(netint);
             }
             NetworkInterface ni = NetworkInterface.getByName("eth3");
-            DatagramChannel s = DatagramChannel.open(StandardProtocolFamily.NET);
+            DatagramChannel s = DatagramChannel.open(StandardProtocolFamily.INET);
             s.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             s.setOption(StandardSocketOptions.IP_MULTICAST_IF, ni);
             s.configureBlocking(false);
@@ -37,13 +37,13 @@ public class SMulticastNO{
             ByteBuffer b = ByteBuffer.allocate(4);
             System.out.println("Servidor listo");
             while (true) {
-                sel.Selector();
+                sel.select();
                 Iterator<SelectionKey> it = sel.selectedKeys().iterator();
                 while (it.hasNext()) {
                     SelectionKey k = (SelectionKey)it.next();
                     it.remove();
                     if(k.isReadable()){
-                        DatagramChannel ch = (DatagramChannel)l.channel();
+                        DatagramChannel ch = (DatagramChannel)k.channel();
                         b.clear();
                         SocketAddress emisor = ch.receive(b);
                         b.flip();
