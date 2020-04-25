@@ -24,17 +24,17 @@ public class SMulticastNO{
             for(NetworkInterface netint:Collections.list(nets)){
                 displayInterfaceInformation(netint);
             }
-            NetworkInterface ni = NetworkInterface.getByName("eth3");
+            NetworkInterface ni = NetworkInterface.getByName("eth2");
             DatagramChannel s = DatagramChannel.open(StandardProtocolFamily.INET);
             s.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             s.setOption(StandardSocketOptions.IP_MULTICAST_IF, ni);
             s.configureBlocking(false);
             Selector sel = Selector.open();
             s.register(sel, SelectionKey.OP_READ);
-            InetAddress group = InetAddress.getByName("230.0.0.1");
+            InetAddress group = InetAddress.getByName("230.1.1.1");
             s.join(group, ni);
             s.socket().bind(dir);
-            ByteBuffer b = ByteBuffer.allocate(4);
+            ByteBuffer b = ByteBuffer.allocate(4000);
             System.out.println("Servidor listo");
             while (true) {
                 sel.select();

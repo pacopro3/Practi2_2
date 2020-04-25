@@ -1,3 +1,6 @@
+
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -111,6 +114,12 @@ public class Inicio extends javax.swing.JFrame {
     
     public boolean getValue(){
         return i;
+    }
+    
+    public void returnValue(){
+        i = false;
+        jTextField1.setText("");
+        JOptionPane.showMessageDialog(null,"El nombre ingresado ya está siendo usado en el chat","Error",JOptionPane.WARNING_MESSAGE);
     }
     
     public String getText(){

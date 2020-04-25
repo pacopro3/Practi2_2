@@ -1,3 +1,7 @@
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +13,16 @@
  * @author Sweet
  */
 public class Interfaz extends javax.swing.JFrame {
-
+    ArrayList <String> arr;
+    String jugador="";
+    boolean flag = false;
     /**
      * Creates new form Interfaz
      */
     public Interfaz() {
+        arr = new ArrayList<String>();
         initComponents();
+        jTextArea2.append("Bienvenido al chat ...");
     }
 
     /**
@@ -53,6 +61,11 @@ public class Interfaz extends javax.swing.JFrame {
         jScrollPane3.setViewportView(jTextArea3);
 
         jButton1.setText("Enviar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Contactos");
 
@@ -97,6 +110,11 @@ public class Interfaz extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        flag = true;
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -131,6 +149,69 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
     }
+    
+    public boolean comprobar(String text){
+        for(String str: arr) {
+            if(str.contains(text)){
+                return true;
+            }
+        }
+        jugador = text;
+        this.setTitle("Bienvenido al chat " + jugador);
+        return false;
+    }
+    
+    public void insertarArray(String text){
+        arr.add(text);
+    }
+    
+public boolean quitarArray(String text){
+        Iterator itr = arr.iterator(); 
+        while (itr.hasNext()) 
+        { 
+            String x = (String)itr.next(); 
+            if (text.equals(x)){
+                itr.remove();
+                return true;
+            }    
+        }
+        
+        return false;
+    }
+
+public boolean existeArray(String text){
+        Iterator itr = arr.iterator(); 
+        while (itr.hasNext()) 
+        { 
+            String x = (String)itr.next(); 
+            if (text.equals(x)){
+                return true;
+            }    
+        }
+        return false;
+    }
+
+    public void writeMsj(String msj){
+        //aqui interpretamos el texto y lo convertimos en un mensaje ya sea publico o privado
+        jTextArea2.append("\n" + msj);
+    }
+    
+    public boolean getFlag(){
+        return flag;
+    }
+    
+    public void setFlag(boolean flag){
+        this.flag = flag;
+    }
+    public String getText(){
+        return jTextArea3.getText().toString();
+    }
+    
+    public void setText(String text){
+        jTextArea3.setText(text);
+    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
