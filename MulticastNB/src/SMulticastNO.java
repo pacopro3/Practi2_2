@@ -17,7 +17,7 @@ public class SMulticastNO{
     }
 
     public static void main(String[] args) {
-        int pto=2000;
+        int pto=4000;
         try {
             InetSocketAddress dir = new InetSocketAddress(pto);
             Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();

@@ -34,6 +34,7 @@ public class Cliente extends Thread{
     public static void main(String[] args) {
         int pto=4000;
         String hhost = "230.1.1.1";
+        InetSocketAddress dir = new InetSocketAddress(pto);
         final SocketAddress remote = new InetSocketAddress(hhost, pto);
         Inicio i = new Inicio();
         boolean f = true;
@@ -54,8 +55,9 @@ public class Cliente extends Thread{
             cl.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             cl.setOption(StandardSocketOptions.IP_MULTICAST_IF, ni);
             cl.configureBlocking(false);
+            cl.socket().bind(dir);
             InetAddress group = InetAddress.getByName("230.1.1.1");
-            
+            cl.join(group,ni);
             
             //hasta aquí se realiza la conexión de forma correcta
             
@@ -91,15 +93,13 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(2048);
+                            ByteBuffer bb = ByteBuffer.allocate(1000);
                             while (true){
                                 selector_read.select();
                                 Iterator<SelectionKey> iterator = selector_read.selectedKeys().iterator();
                                 while (iterator.hasNext()) {
                                     SelectionKey key = iterator.next();
                                     if (key.isReadable()) {
-                                        
-                                        System.err.println("Leimos algo\n");
                                         DatagramChannel dc = (DatagramChannel) key.channel();
                                         SocketAddress emisor = dc.receive(bb);
                                         InetSocketAddress d = (InetSocketAddress)emisor;
@@ -109,7 +109,7 @@ public class Cliente extends Thread{
                                         if(converted.equals("100")){
                                             System.out.println("Entramos a un nuevo usuario");
                                         }else{
-                                            System.err.println("Mandamos mensaje\n");
+                                            System.err.println(converted  + " Mandamos mensaje\n");
                                             in.writeMsj(converted);
                                         }
                                         bb.clear();
@@ -136,7 +136,7 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(2048);
+                            ByteBuffer bb = ByteBuffer.allocate(1000);
                             while (true) {
                                 selector_write.select();
                                 Iterator<SelectionKey> iterator = selector_write.selectedKeys().iterator();
@@ -146,10 +146,12 @@ public class Cliente extends Thread{
                                         DatagramChannel ch = (DatagramChannel)key.channel();
                                         bb.clear();
                                         if(in.getFlag()){
-                                            System.err.println("Get Text: " + in.getText() + "\n");
-                                            bb.wrap(in.getText().getBytes("UTF-8"));
+                                            String texto = in.getText();
+                                            System.err.println("Get Text: " + texto + "\n");
+                                            bb.wrap(texto.getBytes("UTF-8"),0,texto.length());
+                                            System.err.println("Get Text2: " + texto + "\n");
                                             bb.flip();
-                                            System.err.println(in.getText() + " Mensaje enviado \n");
+                                            System.err.println(new String(bb.array(), "UTF-8") + " Mensaje enviado \n");
                                             ch.send(bb, remote);
                                             in.setText("");
                                             in.setFlag(false);
