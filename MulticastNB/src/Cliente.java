@@ -36,6 +36,7 @@ public class Cliente extends Thread{
         String hhost = "230.1.1.1";
         InetSocketAddress dir = new InetSocketAddress(pto);
         final SocketAddress remote = new InetSocketAddress(hhost, pto);
+        final String persona;
         Inicio i = new Inicio();
         boolean f = true;
         Interfaz in = new Interfaz();
@@ -76,10 +77,11 @@ public class Cliente extends Thread{
                     ex.printStackTrace();
                 }
             }while(f);
+            persona = text;
             i.setVisible(false);
             i.dispose();
             in.setVisible(true);
-            
+            in.insertarArray("Todos");
             //aquí ya se inicia el chat
             
             Thread reader = null;
@@ -93,7 +95,8 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(1000);
+                            ByteBuffer bb = ByteBuffer.allocate(256);
+                            String people = persona;
                             while (true){
                                 selector_read.select();
                                 Iterator<SelectionKey> iterator = selector_read.selectedKeys().iterator();
@@ -109,7 +112,7 @@ public class Cliente extends Thread{
                                         if(converted.equals("100")){
                                             System.out.println("Entramos a un nuevo usuario");
                                         }else{
-                                            System.err.println(converted  + " Mandamos mensaje\n");
+                                            System.err.println(converted  + " Mensaje recibido de " + people + "\n");
                                             in.writeMsj(converted);
                                         }
                                         bb.clear();
@@ -136,7 +139,8 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(1000);
+                            ByteBuffer bb = ByteBuffer.allocate(256);
+                            String people = persona;
                             while (true) {
                                 selector_write.select();
                                 Iterator<SelectionKey> iterator = selector_write.selectedKeys().iterator();
@@ -146,12 +150,13 @@ public class Cliente extends Thread{
                                         DatagramChannel ch = (DatagramChannel)key.channel();
                                         bb.clear();
                                         if(in.getFlag()){
-                                            String texto = in.getText();
-                                            System.err.println("Get Text: " + texto + "\n");
-                                            bb.wrap(texto.getBytes("UTF-8"),0,texto.length());
-                                            System.err.println("Get Text2: " + texto + "\n");
-                                            bb.flip();
-                                            System.err.println(new String(bb.array(), "UTF-8") + " Mensaje enviado \n");
+                                            String msj = in.getText();
+                                            String tipo = "";
+                                            String destino = "";
+                                            String texto = msj;
+                                            
+                                            System.err.println("El texto que " + people + " envía: " + texto + "\n");
+                                            bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
                                             ch.send(bb, remote);
                                             in.setText("");
                                             in.setFlag(false);
