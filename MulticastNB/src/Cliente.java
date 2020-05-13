@@ -109,12 +109,16 @@ public class Cliente extends Thread{
                                         bb.flip();
                                         String converted = new String(bb.array(), "UTF-8");
                                         converted = converted.trim();
-                                        if(converted.equals("100")){
-                                            System.out.println("Entramos a un nuevo usuario");
-                                        }else{
-                                            System.err.println(converted  + " Mensaje recibido de " + people + "\n");
+                                        String msj[] = converted.split("<>");
+                                        if(msj[0].equals("Todos")){
+                                            System.err.println("Mensaje recibido de " + msj[1] + " con el texto:" + msj[2] +  "\n");
+                                            in.writeMsj(converted);
+                                        }else if(msj[0].equals(people)){
+                                            System.err.println("Mensaje recibido de " + msj[1] + " con el texto:" + msj[2] +  "\n");
                                             in.writeMsj(converted);
                                         }
+                                        
+                                        
                                         bb.clear();
                                         iterator.remove();
                                     }
@@ -151,9 +155,8 @@ public class Cliente extends Thread{
                                         bb.clear();
                                         if(in.getFlag()){
                                             String msj = in.getText();
-                                            String tipo = "";
-                                            String destino = "";
-                                            String texto = msj;
+                                            String tipo = in.getTipo();
+                                            String texto = tipo + "<>" + people + "<>" + msj;
                                             
                                             System.err.println("El texto que " + people + " envía: " + texto + "\n");
                                             bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());

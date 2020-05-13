@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListModel;
 
@@ -15,17 +16,18 @@ import javax.swing.ListModel;
  * @author Sweet
  */
 public class Interfaz extends javax.swing.JFrame {
-    ArrayList <String> arr;
+    DefaultListModel listModel;
     String jugador="";
     boolean flag = false;
     /**
      * Creates new form Interfaz
      */
     public Interfaz() {
-        arr = new ArrayList<String>();
+        listModel = new DefaultListModel();
         initComponents();
         jTextArea2.append("Bienvenido al chat ...\n");
         jTextArea3.requestFocus();
+        jList1.setModel(listModel);
     }
 
     /**
@@ -157,8 +159,8 @@ public class Interfaz extends javax.swing.JFrame {
     }
     
     public boolean comprobar(String text){
-        for(String str: arr) {
-            if(str.contains(text)){
+        for(int i = 0; i< jList1.getModel().getSize();i++){
+            if(jList1.getModel().getElementAt(i).equals(text)){
                 return true;
             }
         }
@@ -168,33 +170,25 @@ public class Interfaz extends javax.swing.JFrame {
     }
     
     public void insertarArray(String text){
-        arr.add(text);
-        llenarContactos();
+        listModel.addElement(text);
+        jList1.setSelectedIndex(0);
     }
     
-public boolean quitarArray(String text){
-        Iterator itr = arr.iterator(); 
-        while (itr.hasNext()) 
-        { 
-            String x = (String)itr.next(); 
-            if (text.equals(x)){
-                itr.remove();
-                llenarContactos();
+    public boolean quitarArray(String text){
+        for(int i = 0; i< jList1.getModel().getSize();i++){
+            if(jList1.getModel().getElementAt(i).equals(text)){
+                listModel.remove(i);
                 return true;
-            }    
+            }
         }
-        llenarContactos();
         return false;
     }
 
-public boolean existeArray(String text){
-        Iterator itr = arr.iterator(); 
-        while (itr.hasNext()) 
-        { 
-            String x = (String)itr.next(); 
-            if (text.equals(x)){
+    public boolean existeArray(String text){
+        for(int i = 0; i< jList1.getModel().getSize();i++){
+            if(jList1.getModel().getElementAt(i).equals(text)){
                 return true;
-            }    
+            }
         }
         return false;
     }
@@ -219,9 +213,10 @@ public boolean existeArray(String text){
         jTextArea3.setText(text);
     }
     
-    public void llenarContactos(){
-        
+    public String getTipo(){
+        return jList1.getSelectedValue();
     }
+    
     
     
 
