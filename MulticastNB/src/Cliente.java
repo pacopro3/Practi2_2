@@ -82,6 +82,11 @@ public class Cliente extends Thread{
             i.dispose();
             in.setVisible(true);
             in.insertarArray("Todos");
+            ByteBuffer bb = ByteBuffer.allocate(256);
+            String texto = "Nuevo<>" + persona + "<>" + persona + " se ha unido al chat";
+            bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
+            cl.send(bb, remote);
+            
             //aquí ya se inicia el chat
             
             Thread reader = null;
@@ -116,6 +121,10 @@ public class Cliente extends Thread{
                                         }else if(msj[0].equals(people)){
                                             System.err.println("Mensaje recibido de " + msj[1] + " con el texto:" + msj[2] +  "\n");
                                             in.writeMsj(converted);
+                                        }else if(msj[0].equals("Nuevo") && !msj[1].equals(people)){
+                                            in.insertarArray(msj[1]);
+                                            System.err.println("Nueva persona en el chat: " + msj[1] + " con el texto:" + msj[2] +  "\n");
+                                            in.writeMsj(msj[2]);
                                         }
                                         
                                         
