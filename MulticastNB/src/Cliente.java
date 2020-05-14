@@ -122,8 +122,8 @@ public class Cliente extends Thread{
                                             else in.insertMSJ(msj[1], msj[2]);
                                         }else if(msj[0].equals(people)){//Si el mensaje recibido es únicamente para alguien en específico
                                             in.insertMSJ("Privado de " + msj[1], msj[2]);
-                                        }else if(msj[1].equals(people) && !(msj[0].equals("Nuevo") || msj[0].equals("PrivadoNuevo"))){//Si el mensaje recibido es únicamente para alguien en específico
-                                            in.writeMsj("Privado Tu->" + msj[1], msj[2]);
+                                        }else if(msj[1].equals(people) && !(msj[0].equals("Nuevo") || msj[0].equals("PrivadoNuevo"))){//Para saber a quien le mandamos el mensaje privado y se muestre en nuestro chat
+                                            in.writeMsj("Privado Tu->" + msj[0], msj[2]);
                                         }else if(msj[0].equals("Nuevo") && !msj[1].equals(people)){//Cuando un nuevo se integra viene con el texto Nuevo y su información
                                             //El mensaje nuevo se compone de 3 partes Nuevo - Origen - Nombre a dar de alta
                                             in.insertarArray(msj[1]);
@@ -174,9 +174,11 @@ public class Cliente extends Thread{
                                         DatagramChannel ch = (DatagramChannel)key.channel();
                                         bb.clear();
                                         if(in.getFlag()){
-                                            String msj = in.getText();
-                                            String tipo = in.getTipo();
-                                            String texto = tipo + "<>" + people + "<>" + msj;
+                                            //El mensaje se construye de 3 partes 
+                                            //Destino - Origen - Mensaje
+                                            String msj = in.getText();//El texto viene del jTextArea3 
+                                            String tipo = in.getTipo();//El destino viene del jList1
+                                            String texto = tipo + "<>" + people + "<>" + msj;//Se concatenan con el origen que es el nombre escrito al iniciar la ejecución
                                             bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
                                             ch.send(bb, remote);
                                             in.setText("");

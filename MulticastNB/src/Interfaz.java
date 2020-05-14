@@ -1,15 +1,21 @@
 
+import java.awt.event.KeyEvent;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -60,12 +66,22 @@ public class Interfaz extends javax.swing.JFrame {
 
         jTextArea3.setColumns(20);
         jTextArea3.setRows(5);
+        jTextArea3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextArea3KeyPressed(evt);
+            }
+        });
         jScrollPane3.setViewportView(jTextArea3);
 
         jButton1.setText("Enviar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+        jButton1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jButton1KeyPressed(evt);
             }
         });
 
@@ -124,9 +140,27 @@ public class Interfaz extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // Al presionar el boton 
         flag = true;
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextArea3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea3KeyPressed
+        // Validación de tecla presionada para el ENTER y TAB
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            flag = true;
+        }
+        if(evt.getKeyCode() == KeyEvent.VK_TAB) {
+            jButton1.requestFocus();
+        }
+        
+    }//GEN-LAST:event_jTextArea3KeyPressed
+
+    private void jButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyPressed
+        // Validación de tecla ENTER presionada en el button 
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            flag = true;
+        }
+    }//GEN-LAST:event_jButton1KeyPressed
 
     /**
      * @param args the command line arguments
@@ -163,7 +197,7 @@ public class Interfaz extends javax.swing.JFrame {
         });
     }
     
-    public boolean comprobar(String text){
+    public boolean comprobar(String text){ //Validación para ingresar al chat
         for(int i = 0; i< jList1.getModel().getSize();i++){
             if(jList1.getModel().getElementAt(i).equals(text)){
                 return true;
@@ -174,12 +208,12 @@ public class Interfaz extends javax.swing.JFrame {
         return false;
     }
     
-    public void insertarArray(String text){
+    public void insertarArray(String text){//Insertamos un nuevo integrante del chat
         listModel.addElement(text);
         jList1.setSelectedIndex(0);
     }
     
-    public boolean quitarArray(String text){
+    public boolean quitarArray(String text){ //Quitamos el integrante del chat restante
         for(int i = 0; i< jList1.getModel().getSize();i++){
             if(jList1.getModel().getElementAt(i).equals(text)){
                 listModel.remove(i);
@@ -189,7 +223,7 @@ public class Interfaz extends javax.swing.JFrame {
         return false;
     }
 
-    public boolean existeArray(String text){
+    public boolean existeArray(String text){//validamos si existe el integrante solicitado
         for(int i = 0; i< jList1.getModel().getSize();i++){
             if(jList1.getModel().getElementAt(i).equals(text)){
                 return true;
@@ -199,7 +233,7 @@ public class Interfaz extends javax.swing.JFrame {
     }
 
     public void writeMsj(String origen,String msj){
-        //aqui interpretamos el texto y lo convertimos en un mensaje ya sea publico o privado
+        //aqui se escribe la parte derecha del chat donde son nuestros mensajes que mandamos
         try {
             StyleConstants.setBold(attrs, true);
             StyleConstants.setAlignment(attrs,StyleConstants.ALIGN_RIGHT);
@@ -211,12 +245,51 @@ public class Interfaz extends javax.swing.JFrame {
             StyleConstants.setBold(attrs, false);
             StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_RIGHT);
             jTextPane1.getStyledDocument().setParagraphAttributes(
-                                jTextPane1.getStyledDocument().getLength(), msj.length(), attrs, false);
+                                jTextPane1.getStyledDocument().getLength(), msj.length()  + 2, attrs, false);
             jTextPane1.getStyledDocument().insertString(
 				jTextPane1.getStyledDocument().getLength(), msj + "\n", attrs);
         } catch (BadLocationException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        // Aquí reemplazamos los íconos en caso de existir
+        
+         Document doc = jTextPane1.getDocument();
+         String find=";)";
+         String find1=":P";
+         String find2=":*";
+         String currentDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+         
+                    try {
+                        for (int pos = 0; pos < doc.getLength() - find1.length(); pos++) {
+
+                            String text = doc.getText(pos, find.length());
+                            if (find.equals(text)) {
+                                doc.remove(pos, find1.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName0", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_guino.jpg"));
+                                doc2.insertString(pos, "GG", style2);
+                            }
+                            if (find1.equals(text)) {
+                                doc.remove(pos, find1.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName1", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_gesto.jpg"));
+                                doc.insertString(pos, "GG", style2);
+                            }
+                            if (find2.equals(text)) {
+                                doc.remove(pos, find2.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName2", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_beso.jpg"));
+                                doc.insertString(pos, "GG", style2);
+                            }
+
+                        }
+                    } catch (BadLocationException exp) {
+                        exp.printStackTrace();
+                    }
     
     }
     
@@ -227,7 +300,7 @@ public class Interfaz extends javax.swing.JFrame {
     public void setFlag(boolean flag){
         this.flag = flag;
     }
-    public String getText(){
+    public String getText(){//Regresa el texto del jTextArea3
         return jTextArea3.getText().toString();
     }
     
@@ -235,11 +308,12 @@ public class Interfaz extends javax.swing.JFrame {
         jTextArea3.setText(text);
     }
     
-    public String getTipo(){
+    public String getTipo(){//Regresa si vamos a enviar mensaje a todos o a alguien en privado
         return jList1.getSelectedValue();
     }
     
     public void insertMSJ(String origen, String msj){
+        //Aqui se escribe la parte izquierda del chat donde nos indica quien nos ha escrito mensaje
         try {
             StyleConstants.setBold(attrs, true);
             StyleConstants.setAlignment(attrs,0);
@@ -253,12 +327,52 @@ public class Interfaz extends javax.swing.JFrame {
             StyleConstants.setAlignment(attrs,0);
             StyleConstants.setAlignment(attrs,StyleConstants.ALIGN_LEFT);
             jTextPane1.getStyledDocument().setParagraphAttributes(
-                                jTextPane1.getStyledDocument().getLength(), msj.length(), attrs, false);
+                                jTextPane1.getStyledDocument().getLength(), msj.length() + 2, attrs, false);
             jTextPane1.getStyledDocument().insertString(
 				jTextPane1.getStyledDocument().getLength(), msj + "\n", attrs);
         } catch (BadLocationException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+        // Aquí reemplazamos los íconos en caso de existir
+        
+         Document doc = jTextPane1.getDocument();
+         String find=";)";
+         String find1=":P";
+         String find2=":*";
+         String currentDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+         
+                    try {
+                        for (int pos = 0; pos < doc.getLength() - find1.length(); pos++) {
+
+                            String text = doc.getText(pos, find.length());
+                            if (find.equals(text)) {
+                                doc.remove(pos, find1.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName0", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_guino.jpg"));
+                                doc2.insertString(pos, "GG", style2);
+                            }
+                            if (find1.equals(text)) {
+                                doc.remove(pos, find1.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName1", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_gesto.jpg"));
+                                doc.insertString(pos, "GG", style2);
+                            }
+                            if (find2.equals(text)) {
+                                doc.remove(pos, find2.length());
+                                StyledDocument doc2 = (StyledDocument) jTextPane1.getDocument();
+                                Style style2 = doc2.addStyle("StyleName2", null);
+                                StyleConstants.setIcon(style2, new ImageIcon(currentDirectory + "\\img\\imagen_beso.jpg"));
+                                doc.insertString(pos, "GG", style2);
+                            }
+
+                        }
+                    } catch (BadLocationException exp) {
+                        exp.printStackTrace();
+                    }
     }
             
     
