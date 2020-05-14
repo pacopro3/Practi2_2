@@ -1,9 +1,15 @@
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -18,14 +24,15 @@ import javax.swing.ListModel;
 public class Interfaz extends javax.swing.JFrame {
     DefaultListModel listModel;
     String jugador="";
+    SimpleAttributeSet attrs;
     boolean flag = false;
     /**
      * Creates new form Interfaz
      */
     public Interfaz() {
+        attrs = new SimpleAttributeSet();
         listModel = new DefaultListModel();
         initComponents();
-        jTextArea2.append("Bienvenido al chat ...");
         jTextArea3.requestFocus();
         jList1.setModel(listModel);
     }
@@ -43,11 +50,11 @@ public class Interfaz extends javax.swing.JFrame {
         jTextArea3 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextPane1 = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,14 +71,12 @@ public class Interfaz extends javax.swing.JFrame {
 
         jLabel1.setText("Chat grupal");
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
-
         jLabel2.setText("Contactos");
 
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane4.setViewportView(jList1);
+
+        jScrollPane1.setViewportView(jTextPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -89,8 +94,8 @@ public class Interfaz extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(29, 29, 29)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane3)))
+                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane1)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(87, 87, 87)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
@@ -106,7 +111,7 @@ public class Interfaz extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -193,9 +198,26 @@ public class Interfaz extends javax.swing.JFrame {
         return false;
     }
 
-    public void writeMsj(String msj){
+    public void writeMsj(String origen,String msj){
         //aqui interpretamos el texto y lo convertimos en un mensaje ya sea publico o privado
-        jTextArea2.append("\n" + msj);
+        try {
+            StyleConstants.setBold(attrs, true);
+            StyleConstants.setAlignment(attrs,StyleConstants.ALIGN_RIGHT);
+            jTextPane1.getStyledDocument().setParagraphAttributes(
+                                jTextPane1.getStyledDocument().getLength(), origen.length(), attrs, false);
+            jTextPane1.getStyledDocument().insertString(
+				jTextPane1.getStyledDocument().getLength(), origen + "\n", attrs);
+            
+            StyleConstants.setBold(attrs, false);
+            StyleConstants.setAlignment(attrs, StyleConstants.ALIGN_RIGHT);
+            jTextPane1.getStyledDocument().setParagraphAttributes(
+                                jTextPane1.getStyledDocument().getLength(), msj.length(), attrs, false);
+            jTextPane1.getStyledDocument().insertString(
+				jTextPane1.getStyledDocument().getLength(), msj + "\n", attrs);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
     }
     
     public boolean getFlag(){
@@ -217,6 +239,29 @@ public class Interfaz extends javax.swing.JFrame {
         return jList1.getSelectedValue();
     }
     
+    public void insertMSJ(String origen, String msj){
+        try {
+            StyleConstants.setBold(attrs, true);
+            StyleConstants.setAlignment(attrs,0);
+            StyleConstants.setAlignment(attrs,StyleConstants.ALIGN_LEFT);
+            jTextPane1.getStyledDocument().setParagraphAttributes(
+                                jTextPane1.getStyledDocument().getLength(), origen.length(), attrs, false);
+            jTextPane1.getStyledDocument().insertString(
+				jTextPane1.getStyledDocument().getLength(), origen + "\n", attrs);
+            
+            StyleConstants.setBold(attrs, false);
+            StyleConstants.setAlignment(attrs,0);
+            StyleConstants.setAlignment(attrs,StyleConstants.ALIGN_LEFT);
+            jTextPane1.getStyledDocument().setParagraphAttributes(
+                                jTextPane1.getStyledDocument().getLength(), msj.length(), attrs, false);
+            jTextPane1.getStyledDocument().insertString(
+				jTextPane1.getStyledDocument().getLength(), msj + "\n", attrs);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+            
+    
     
     
 
@@ -225,10 +270,10 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 }

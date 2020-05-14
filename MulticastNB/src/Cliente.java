@@ -117,15 +117,17 @@ public class Cliente extends Thread{
                                         String converted = new String(bb.array(), "UTF-8");
                                         converted = converted.trim();
                                         String msj[] = converted.split("<>");
-                                        System.out.println("MSJ Receive:" + converted);
                                         if(msj[0].equals("Todos")){// Cuando el mensaje es publico y todos lo pueden leer
-                                            in.writeMsj(converted);
+                                            if(msj[1].equals(people)) in.writeMsj("Tu", msj[2]);
+                                            else in.insertMSJ(msj[1], msj[2]);
                                         }else if(msj[0].equals(people)){//Si el mensaje recibido es únicamente para alguien en específico
-                                            in.writeMsj(converted);
+                                            in.insertMSJ("Privado de " + msj[1], msj[2]);
+                                        }else if(msj[1].equals(people) && !(msj[0].equals("Nuevo") || msj[0].equals("PrivadoNuevo"))){//Si el mensaje recibido es únicamente para alguien en específico
+                                            in.writeMsj("Privado Tu->" + msj[1], msj[2]);
                                         }else if(msj[0].equals("Nuevo") && !msj[1].equals(people)){//Cuando un nuevo se integra viene con el texto Nuevo y su información
                                             //El mensaje nuevo se compone de 3 partes Nuevo - Origen - Nombre a dar de alta
                                             in.insertarArray(msj[1]);
-                                            in.writeMsj(msj[2] + " se ha unido al chat");
+                                            in.insertMSJ(msj[2] + " se ha unido al chat", "");
                                             String nuevo = "PrivadoNuevo<>" + msj[1] + "<>" + people;
                                             bb.clear();
                                             //Privado nuevo tiene 3 partes PrivadoNuevo - Destino - Origen
@@ -134,7 +136,7 @@ public class Cliente extends Thread{
                                         }else if(msj[0].equals("PrivadoNuevo") && msj[1].equals(people)){//Cuando un nuevo entra le respondemos en privado que nos agregue a su lista
                                             if(!in.existeArray(msj[2])){
                                                 in.insertarArray(msj[2]);
-                                                in.writeMsj(msj[2] + " se ha unido al chat");
+                                                in.insertMSJ(msj[2] + " se ha unido al chat" , "");
                                             }
                                         }
                                         bb.clear();
@@ -176,7 +178,6 @@ public class Cliente extends Thread{
                                             String tipo = in.getTipo();
                                             String texto = tipo + "<>" + people + "<>" + msj;
                                             bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
-                                            System.out.println("MSJ:" + texto);
                                             ch.send(bb, remote);
                                             in.setText("");
                                             in.setFlag(false);
