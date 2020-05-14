@@ -82,10 +82,12 @@ public class Cliente extends Thread{
             i.dispose();
             in.setVisible(true);
             in.insertarArray("Todos");
-            ByteBuffer bb = ByteBuffer.allocate(256);
-            String texto = "Nuevo<>" + persona + "<>" + persona + " se ha unido al chat";
-            bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
-            cl.send(bb, remote);
+            ByteBuffer b = ByteBuffer.allocate(1024);
+            String nuevos = "Nuevo<>" + persona + "<>" + persona;
+            System.out.println("Texto: " + nuevos);
+            b = ByteBuffer.wrap(nuevos.getBytes("UTF-8"),0,nuevos.length());
+            cl.send(b, remote);
+            b.clear();
             
             //aquí ya se inicia el chat
             
@@ -100,36 +102,42 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(256);
+                            ByteBuffer bb;
                             String people = persona;
                             while (true){
                                 selector_read.select();
                                 Iterator<SelectionKey> iterator = selector_read.selectedKeys().iterator();
-                                while (iterator.hasNext()) {
+                                while (iterator.hasNext()){
+                                    bb = ByteBuffer.allocate(1024);
                                     SelectionKey key = iterator.next();
                                     if (key.isReadable()) {
                                         DatagramChannel dc = (DatagramChannel) key.channel();
                                         SocketAddress emisor = dc.receive(bb);
                                         InetSocketAddress d = (InetSocketAddress)emisor;
-                                        bb.flip();
                                         String converted = new String(bb.array(), "UTF-8");
                                         converted = converted.trim();
                                         String msj[] = converted.split("<>");
-                                        if(msj[0].equals("Todos")){
-                                            System.err.println("Mensaje recibido de " + msj[1] + " con el texto:" + msj[2] +  "\n");
+                                        System.out.println("MSJ Receive:" + converted);
+                                        if(msj[0].equals("Todos")){// Cuando el mensaje es publico y todos lo pueden leer
                                             in.writeMsj(converted);
-                                        }else if(msj[0].equals(people)){
-                                            System.err.println("Mensaje recibido de " + msj[1] + " con el texto:" + msj[2] +  "\n");
+                                        }else if(msj[0].equals(people)){//Si el mensaje recibido es únicamente para alguien en específico
                                             in.writeMsj(converted);
-                                        }else if(msj[0].equals("Nuevo") && !msj[1].equals(people)){
+                                        }else if(msj[0].equals("Nuevo") && !msj[1].equals(people)){//Cuando un nuevo se integra viene con el texto Nuevo y su información
+                                            //El mensaje nuevo se compone de 3 partes Nuevo - Origen - Nombre a dar de alta
                                             in.insertarArray(msj[1]);
-                                            System.err.println("Nueva persona en el chat: " + msj[1] + " con el texto:" + msj[2] +  "\n");
-                                            in.writeMsj(msj[2]);
+                                            in.writeMsj(msj[2] + " se ha unido al chat");
+                                            String nuevo = "PrivadoNuevo<>" + msj[1] + "<>" + people;
+                                            bb.clear();
+                                            //Privado nuevo tiene 3 partes PrivadoNuevo - Destino - Origen
+                                            bb = ByteBuffer.wrap(nuevo.getBytes("UTF-8"),0,nuevo.length());
+                                            dc.send(bb, remote);
+                                        }else if(msj[0].equals("PrivadoNuevo") && msj[1].equals(people)){//Cuando un nuevo entra le respondemos en privado que nos agregue a su lista
+                                            if(!in.existeArray(msj[2])){
+                                                in.insertarArray(msj[2]);
+                                                in.writeMsj(msj[2] + " se ha unido al chat");
+                                            }
                                         }
-                                        
-                                        
                                         bb.clear();
-                                        iterator.remove();
                                     }
                                 }
                             }
@@ -152,9 +160,10 @@ public class Cliente extends Thread{
                     @Override
                     public void run() {
                         try {
-                            ByteBuffer bb = ByteBuffer.allocate(256);
+                            ByteBuffer bb;
                             String people = persona;
                             while (true) {
+                                bb = ByteBuffer.allocate(1024);
                                 selector_write.select();
                                 Iterator<SelectionKey> iterator = selector_write.selectedKeys().iterator();
                                 while (iterator.hasNext()) {
@@ -166,9 +175,8 @@ public class Cliente extends Thread{
                                             String msj = in.getText();
                                             String tipo = in.getTipo();
                                             String texto = tipo + "<>" + people + "<>" + msj;
-                                            
-                                            System.err.println("El texto que " + people + " envía: " + texto + "\n");
                                             bb = ByteBuffer.wrap(texto.getBytes("UTF-8"),0,texto.length());
+                                            System.out.println("MSJ:" + texto);
                                             ch.send(bb, remote);
                                             in.setText("");
                                             in.setFlag(false);

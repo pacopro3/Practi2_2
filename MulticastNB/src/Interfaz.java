@@ -25,7 +25,7 @@ public class Interfaz extends javax.swing.JFrame {
     public Interfaz() {
         listModel = new DefaultListModel();
         initComponents();
-        jTextArea2.append("Bienvenido al chat ...\n");
+        jTextArea2.append("Bienvenido al chat ...");
         jTextArea3.requestFocus();
         jList1.setModel(listModel);
     }
