@@ -32,6 +32,7 @@ public class Interfaz extends javax.swing.JFrame {
     String jugador="";
     SimpleAttributeSet attrs;
     boolean flag = false;
+    boolean close = false;
     /**
      * Creates new form Interfaz
      */
@@ -62,7 +63,12 @@ public class Interfaz extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jTextArea3.setColumns(20);
         jTextArea3.setRows(5);
@@ -162,6 +168,11 @@ public class Interfaz extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1KeyPressed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        close = true;
+    }//GEN-LAST:event_formWindowClosing
+
     /**
      * @param args the command line arguments
      */
@@ -214,6 +225,7 @@ public class Interfaz extends javax.swing.JFrame {
     }
     
     public boolean quitarArray(String text){ //Quitamos el integrante del chat restante
+        jList1.setSelectedIndex(0);
         for(int i = 0; i< jList1.getModel().getSize();i++){
             if(jList1.getModel().getElementAt(i).equals(text)){
                 listModel.remove(i);
@@ -295,6 +307,10 @@ public class Interfaz extends javax.swing.JFrame {
     
     public boolean getFlag(){
         return flag;
+    }
+    
+    public boolean getClose(){
+        return close;
     }
     
     public void setFlag(boolean flag){

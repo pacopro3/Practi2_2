@@ -138,6 +138,9 @@ public class Cliente extends Thread{
                                                 in.insertarArray(msj[2]);
                                                 in.insertMSJ(msj[2] + " se ha unido al chat" , "");
                                             }
+                                        }else if(msj[0].equals("Cierre")){
+                                            in.quitarArray(msj[1]);
+                                            in.insertMSJ(msj[2] + " se ha retirado del chat", "");
                                         }
                                         bb.clear();
                                     }
@@ -199,12 +202,26 @@ public class Cliente extends Thread{
                 };
                 writer.setName("writer");
                 writer.start();
+            f=true;
+            do{
+                try {
+                if(in.getClose()==true){ 
+                    ByteBuffer be = ByteBuffer.allocate(1024);
+                    String fin = "Cierre<>" + persona + "<>" + persona;
+                    System.out.println("Texto: " + fin);
+                    be = ByteBuffer.wrap(fin.getBytes("UTF-8"),0,fin.length());
+                    cl.send(be, remote);
+                    be.clear();
+                    f=false;
+                }
+                Thread.sleep(200);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }while(f);
             
-
-            Scanner readline = new Scanner(System.in);
-            readline.nextLine();
-            
-
+            in.setVisible(false);
+            in.dispose();
             
             reader.interrupt();
             writer.interrupt();
