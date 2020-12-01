@@ -1,6 +1,6 @@
 # Practica 2.2 Chat multicast con emojis
 
-_El objetivo de este código es realizar una implementación de un chat multicast con emojis preconfigurados para que en el mensaje que se manda coloque el emoji entre su texto_
+_El objetivo de este código es realizar una implementación de un chat multicast con emojis preconfigurados para que en el mensaje que se manda coloque el emoji_
 
 ## Pre-requisitos 📋
 
